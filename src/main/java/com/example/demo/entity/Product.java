@@ -1,0 +1,27 @@
+package com.example.demo.entity;
+
+import jakarta.persistence.*;
+import lombok.Data;
+import java.math.BigDecimal;
+
+@Entity
+@Table(name = "products")
+@Data
+public class Product {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @Column(nullable = false)
+    private String name;
+    
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal price;
+	    
+    @Column(nullable = false)
+    private Integer quantity;
+	    
+    @Column(name = "is_enabled")
+    private Boolean enabled = true;
+	}
+
