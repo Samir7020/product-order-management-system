@@ -24,12 +24,20 @@ public class Cart {
     @Column(name = "total_amount", precision = 10, scale = 2)
     private BigDecimal totalAmount = BigDecimal.ZERO;
     
-    // Auto-calculate total BEFORE updating cart in database
-    @PreUpdate
-    protected void calculateTotal() {
-        this.totalAmount = items.stream()
-            .map(item -> item.getProduct().getPrice()
-                .multiply(BigDecimal.valueOf(item.getQuantity())))
-            .reduce(BigDecimal.ZERO, BigDecimal::add);
-    }
+
 }
+
+
+
+
+
+
+
+//// Auto-calculate total BEFORE updating cart in database
+//@PreUpdate
+//protected void calculateTotal() {
+//  this.totalAmount = items.stream()
+//      .map(item -> item.getProduct().getPrice()
+//          .multiply(BigDecimal.valueOf(item.getQuantity())))
+//      .reduce(BigDecimal.ZERO, BigDecimal::add);
+//}

@@ -4,6 +4,7 @@ import com.example.demo.dto.CartItemDTO;
 import com.example.demo.dto.ProductDTO;
 import com.example.demo.entity.Cart;
 import com.example.demo.entity.Order;
+import com.example.demo.security.SecurityUtils;
 import com.example.demo.service.CartService;
 import com.example.demo.service.OrderService;
 import com.example.demo.service.ProductService;
@@ -20,66 +21,71 @@ public class UserController {
     private final ProductService productService;
     private final CartService cartService;
     private final OrderService orderService;
+    private final SecurityUtils securityUtils;
     
-    // View only enabled products
+   
     @GetMapping("/products")
     public ResponseEntity<List<ProductDTO>> viewProducts() {
         return ResponseEntity.ok(productService.getEnabledProducts());
     }
     
-    // View single product
+   
     @GetMapping("/products/{id}")
     public ResponseEntity<ProductDTO> viewProduct(@PathVariable Long id) {
         return ResponseEntity.ok(productService.getProductById(id));
     }
     
-    // Add to cart
-    @PostMapping("/{userId}/cart")
-    public ResponseEntity<Void> addToCart(@PathVariable Long userId, 
-                                          @Valid @RequestBody CartItemDTO dto) {
+   
+    @PostMapping("/cart")
+    public ResponseEntity<Void> addToCart(@Valid @RequestBody CartItemDTO dto) {
+        Long userId = securityUtils.getCurrentUserId();
         cartService.addToCart(userId, dto);
         return ResponseEntity.ok().build();
     }
     
-    // Update cart item quantity
-    @PutMapping("/{userId}/cart/{productId}")
-    public ResponseEntity<Void> updateCartItem(@PathVariable Long userId, 
-                                               @PathVariable Long productId,
+  
+    @PutMapping("/cart/{productId}")
+    public ResponseEntity<Void> updateCartItem(@PathVariable Long productId,
                                                @RequestParam Integer quantity) {
+        Long userId = securityUtils.getCurrentUserId();
         cartService.updateCartItem(userId, productId, quantity);
         return ResponseEntity.ok().build();
     }
     
-    // Remove item from cart
-    @DeleteMapping("/{userId}/cart/{productId}")
-    public ResponseEntity<Void> removeFromCart(@PathVariable Long userId, 
-                                               @PathVariable Long productId) {
+
+    @DeleteMapping("/cart/{productId}")
+    public ResponseEntity<Void> removeFromCart(@PathVariable Long productId) {
+        Long userId = securityUtils.getCurrentUserId();
         cartService.removeFromCart(userId, productId);
         return ResponseEntity.noContent().build();
     }
     
-    // View cart
-    @GetMapping("/{userId}/cart")
-    public ResponseEntity<Cart> viewCart(@PathVariable Long userId) {
+  
+    @GetMapping("/cart")
+    public ResponseEntity<Cart> viewCart() {
+        Long userId = securityUtils.getCurrentUserId();
         return ResponseEntity.ok(cartService.getCart(userId));
     }
     
-    // Place order (TRANSACTIONAL)
-    @PostMapping("/{userId}/orders")
-    public ResponseEntity<Order> placeOrder(@PathVariable Long userId) {
+  
+    @PostMapping("/orders")
+    public ResponseEntity<Order> placeOrder() {
+        Long userId = securityUtils.getCurrentUserId();
         return ResponseEntity.ok(orderService.placeOrder(userId));
     }
     
-    // View all orders
-    @GetMapping("/{userId}/orders")
-    public ResponseEntity<List<Order>> viewOrders(@PathVariable Long userId) {
+    @GetMapping("/orders")
+    public ResponseEntity<List<Order>> viewOrders() {
+        Long userId = securityUtils.getCurrentUserId();
         return ResponseEntity.ok(orderService.getUserOrders(userId));
     }
     
-    // View single order
-    @GetMapping("/{userId}/orders/{orderId}")
-    public ResponseEntity<Order> viewOrder(@PathVariable Long userId, 
-                                           @PathVariable Long orderId) {
-        return ResponseEntity.ok(orderService.getOrderById(orderId));
+
+    @GetMapping("/orders/{orderId}")
+    public ResponseEntity<Order> viewOrder(@PathVariable Long orderId) {
+        Long userId = securityUtils.getCurrentUserId();
+        
+        Order order = orderService.getOrderByIdForUser(orderId, userId);
+        return ResponseEntity.ok(order);
     }
 }

@@ -28,7 +28,7 @@ public class User {
     @NotBlank(message = "Password is required")
     @Column(nullable = false)
     @JsonIgnore
-    private String password;  // Store ENCODED password
+    private String password;  
     
     @Column(nullable = false)
     private String role; // "ROLE_ADMIN" or "ROLE_USER"
